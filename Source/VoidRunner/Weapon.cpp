@@ -3,6 +3,8 @@
 
 #include "Weapon.h"
 
+#include "HittableComponent.h"
+
 
 // Sets default values
 AWeapon::AWeapon()
@@ -40,16 +42,25 @@ void AWeapon::FireWeapon()
 	FVector start = GetActorLocation();
 	FVector end = start + GetActorForwardVector() * 1000.0f;
 
-	// Color of the line.
-	FColor color = FColor::Red;
+	FHitResult Hit;
 
-	// Thickness of the line.
-	float thickness = 10.0f;
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, start, end, ECC_Visibility);
 
-	// Duration of the line.
-	int32 duration = 3;
+	if (bHit)
+	{
+		const AActor* ActorHit = Hit.GetActor();
 
+		if (UHittableComponent* Hittable = ActorHit->FindComponentByClass<UHittableComponent>())
+		{
+			// Draw the line.
+			DrawDebugLine(GetWorld(), start, end, FColor::Green, true, 3, 0,10.0f);
+			Hittable->Damage(-5);
+			return;
+		}
+	}
+	
 	// Draw the line.
-	DrawDebugLine(GetWorld(), start, end, color, true, duration, 0,thickness);
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, true, 3, 0,10.0f);		
+	
 }
 
