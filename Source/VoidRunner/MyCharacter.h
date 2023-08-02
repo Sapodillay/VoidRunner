@@ -34,6 +34,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 #pragma region InputPoints
 	
 	UPROPERTY(EditDefaultsOnly, Category = Input)
@@ -58,6 +60,11 @@ protected:
 	float jumpHeight;
 #pragma endregion InputPointers
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UTimerPlayerHUD> PlayerHUDClass;
+
+	UPROPERTY()
+	class UTimerPlayerHUD* PlayerHUD;
 	
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<AWeapon> WeaponClass;
@@ -75,6 +82,9 @@ protected:
 	void Shoot();
 
 	void SetupWeapon();
+
+	float TimerTime = 0;
+	void TimeTest();
 	
 	
 

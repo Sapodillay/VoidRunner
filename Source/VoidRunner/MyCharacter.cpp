@@ -4,6 +4,8 @@
 #include "MyCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "TimerPlayerHUD.h"
+#include "Blueprint/UserWidget.h"
 
 //Input includes
 #include "Components/InputComponent.h"
@@ -24,14 +26,20 @@ AMyCharacter::AMyCharacter(const FObjectInitializer& ObjectInitalizer)
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
+	//HUD
+	PlayerHUD = nullptr;
+	PlayerHUDClass = nullptr;
 	
 }
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
-	Super::BeginPlay();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AMyCharacter::TimeTest, 1.0f, true, 0);
 
+	Super::BeginPlay();
+	//Setup inputs
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -39,7 +47,30 @@ void AMyCharacter::BeginPlay()
 			 Subsystem->AddMappingContext(MovementContext, 0);
 		}
 	}
+	//Setup weapon
 	SetupWeapon();
+
+	//Setup UI
+	if (IsLocallyControlled() && PlayerHUDClass)
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(Controller);
+		check(PlayerController);
+		PlayerHUD = CreateWidget<UTimerPlayerHUD>(PlayerController, PlayerHUDClass);
+		check(PlayerHUD);
+		PlayerHUD->AddToPlayerScreen();
+	}
+}
+
+void AMyCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (PlayerHUD)
+	{
+		PlayerHUD->RemoveFromParent();
+		PlayerHUD = nullptr;
+	}
+	
 }
 
 void AMyCharacter::Move(const FInputActionValue& Value)
@@ -91,6 +122,17 @@ void AMyCharacter::SetupWeapon()
 	Weapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass);
 	Weapon->AttachToComponent(FirstPersonCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	Weapon->SetOwner(this);
+}
+
+
+//Testing time widget, move to level based timer.
+void AMyCharacter::TimeTest()
+{
+	if(PlayerHUD)
+	{
+		TimerTime++;
+		PlayerHUD->SetTime(TimerTime);
+	}
 }
 
 
