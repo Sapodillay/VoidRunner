@@ -27,7 +27,7 @@ public:
 
 	void ShowMainMenu();
 
-	void TransitionState(EVoidGameState State);
+	void TransitionState(EVoidGameState NewState);
 
 
 

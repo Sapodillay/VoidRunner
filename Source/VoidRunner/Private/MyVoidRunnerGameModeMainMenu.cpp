@@ -15,6 +15,8 @@ AMyVoidRunnerGameModeMainMenu::AMyVoidRunnerGameModeMainMenu()
 void AMyVoidRunnerGameModeMainMenu::StartPlay()
 {
 	//Access game instance, set mode to main menu.
-	UVoidGameInstance* GameInstance = Cast<UVoidGameInstance>(GetGameInstance());
-	GameInstance->ShowMainMenu();
+	if (UVoidGameInstance* GameInstance = Cast<UVoidGameInstance>(GetGameInstance()))
+	{
+		GameInstance->TransitionState(EVoidGameState::MainMenu);
+	}
 }

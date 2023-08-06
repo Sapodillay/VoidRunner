@@ -9,7 +9,6 @@
 void UVoidGameInstance::ShowMainMenu()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Showing main menu"))
-	TransitionState(MainMenu);
 	//Get player controller
 	APlayerController* PlayerController = GetPrimaryPlayerController();
 	check(PlayerController);
@@ -22,9 +21,9 @@ void UVoidGameInstance::ShowMainMenu()
 	PlayerController->SetInputMode(FInputModeUIOnly());
 }
 
-void UVoidGameInstance::TransitionState(EVoidGameState State)
+void UVoidGameInstance::TransitionState(EVoidGameState NewState)
 {
-	if (State == GameState)
+	if (NewState == GameState)
 	{
 		//State is same, don't do anything
 		UE_LOG(LogTemp, Warning, TEXT("Tried to transition to the same state"));
@@ -40,6 +39,7 @@ void UVoidGameInstance::TransitionState(EVoidGameState State)
 		}
 		case MainMenu:
 		{
+		    //Move code to a state class
 			UE_LOG(LogTemp, Warning, TEXT("Transitioning from Menu"));
 			//Hide main menu
 			if (MainMenuHUD)
@@ -56,7 +56,20 @@ void UVoidGameInstance::TransitionState(EVoidGameState State)
 		}
 		default: ;
 	}
-	GameState = State;
+	
+	switch (NewState)
+	{
+		case Startup: break;
+		case MainMenu:
+			{
+				ShowMainMenu();
+			}
+		case Game: break;
+		default: ;
+	}
+	
+	
+	GameState = NewState;
 }
 
 

@@ -17,8 +17,11 @@ void UMainMenuWidget::Setup()
 void UMainMenuWidget::OnStartClicked()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Hiding mainMenu"))
-	UVoidGameInstance* GameInstance = Cast<UVoidGameInstance>(GetGameInstance());
-	GameInstance->TransitionState(EVoidGameState::Game);
+
+	if(UVoidGameInstance* GameInstance = Cast<UVoidGameInstance>(GetGameInstance()))
+	{
+		GameInstance->TransitionState(EVoidGameState::Game);
+	}
 }
 
 
