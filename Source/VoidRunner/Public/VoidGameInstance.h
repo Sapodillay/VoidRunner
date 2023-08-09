@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "LevelDataAsset.h"
 #include "VoidGameState.h"
 #include "Engine/GameInstance.h"
 #include "VoidGameInstance.generated.h"
@@ -20,6 +21,9 @@ class VOIDRUNNER_API UVoidGameInstance : public UGameInstance
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UMainMenuWidget> MainMenuHUDClass;
+
+	UPROPERTY(EditAnywhere)
+	ULevelDataAsset* LevelDataAsset;
 
 public:
 	UPROPERTY(VisibleAnywhere)

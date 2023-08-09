@@ -3,3 +3,7 @@
 
 #include "LevelDataAsset.h"
 
+FString ULevelDataAsset::GetWorldName()
+{
+	return ULevelDataAsset::LevelName;
+}

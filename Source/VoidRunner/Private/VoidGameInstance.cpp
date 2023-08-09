@@ -4,6 +4,7 @@
 #include "VoidGameInstance.h"
 
 #include "MainMenuWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 //Move to an event.
 void UVoidGameInstance::ShowMainMenu()
@@ -63,8 +64,19 @@ void UVoidGameInstance::TransitionState(EVoidGameState NewState)
 		case MainMenu:
 			{
 				ShowMainMenu();
+				break;
 			}
-		case Game: break;
+		case Game: 
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Loading level"))
+				if (!LevelDataAsset)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("No Level DataAsset found"))
+					break;
+				}
+				UGameplayStatics::OpenLevel(GetWorld(), FName(LevelDataAsset->GetWorldName()), true);
+			
+			}
 		default: ;
 	}
 	
