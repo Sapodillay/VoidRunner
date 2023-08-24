@@ -43,7 +43,6 @@ void AWeapon::FireWeapon()
 	FVector end = start + GetActorForwardVector() * 1000.0f;
 
 	FHitResult Hit;
-
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, start, end, ECC_Visibility);
 
 	if (bHit)
