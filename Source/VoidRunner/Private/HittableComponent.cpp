@@ -45,17 +45,13 @@ void UHittableComponent::Damage(int damage)
 {
 	currentHealth = FGenericPlatformMath::Max(currentHealth - damage, 0);
 
-	OnHealthChangedEvent.ExecuteIfBound(currentHealth);
-	if (OnHealthChangedEvent.IsBound())
-	{
-		OnHealthChangedEvent.Execute(currentHealth);
-	}
+	OnHealthChangedEvent.Broadcast(currentHealth);
 	
 	if (currentHealth <= 0)
 	{
 		//death
 		UE_LOG(LogTemp, Warning, TEXT("Death"))
-		OnDeathEvent.ExecuteIfBound();
+		OnDeathEvent.Broadcast();
 	}
 }
 

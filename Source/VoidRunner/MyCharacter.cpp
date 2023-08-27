@@ -93,8 +93,8 @@ void AMyCharacter::BeginPlay()
 	
 	if (HitComponent)
 	{
-		HitComponent->OnDeathEvent.BindDynamic(this, &AMyCharacter::OnDeath);
-		HitComponent->OnHealthChangedEvent.BindDynamic(this, &AMyCharacter::OnHealthChanged);
+		HitComponent->OnDeathEvent.AddDynamic(this, &AMyCharacter::OnDeath);
+		HitComponent->OnHealthChangedEvent.AddDynamic(this, &AMyCharacter::OnHealthChanged);
 	}
 	
 }

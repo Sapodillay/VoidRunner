@@ -6,8 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "HittableComponent.generated.h"
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnHealthChangedEvent, int, health);
-DECLARE_DYNAMIC_DELEGATE(FOnDeathEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedEvent, int, health);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathEvent);
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
