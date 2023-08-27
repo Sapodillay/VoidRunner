@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "TimerPlayerHUD.h"
+#include "UI/HealthWidget.h"
 #include "Blueprint/UserWidget.h"
 
 //Input includes
@@ -26,15 +27,29 @@ AMyCharacter::AMyCharacter(const FObjectInitializer& ObjectInitalizer)
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
+	HitComponent = CreateDefaultSubobject<UHittableComponent>(FName("Hit Component"));
+
+	AbilityInventory = CreateDefaultSubobject<UAbilityInventory>(FName("Ability Inventory"));
+
 	//HUD
 	PlayerHUD = nullptr;
 	PlayerHUDClass = nullptr;
+
+	HealthWidget = nullptr;
+	HealthWidgetClass = nullptr;
 	
 }
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
+
+	if (HitComponent)
+	{
+		//remove magic numbers later.
+		HitComponent->Setup(100);
+	}
+	
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AMyCharacter::TimeTest, 1.0f, true, 0);
 
@@ -51,14 +66,37 @@ void AMyCharacter::BeginPlay()
 	SetupWeapon();
 
 	//Setup UI
-	if (IsLocallyControlled() && PlayerHUDClass)
+	if (IsLocallyControlled())
 	{
-		APlayerController* PlayerController = Cast<APlayerController>(Controller);
-		check(PlayerController);
-		PlayerHUD = CreateWidget<UTimerPlayerHUD>(PlayerController, PlayerHUDClass);
-		check(PlayerHUD);
-		PlayerHUD->AddToPlayerScreen();
+		if (PlayerHUDClass)
+		{
+			APlayerController* PlayerController = Cast<APlayerController>(Controller);
+			check(PlayerController);
+			PlayerHUD = CreateWidget<UTimerPlayerHUD>(PlayerController, PlayerHUDClass);
+			check(PlayerHUD);
+			PlayerHUD->AddToPlayerScreen();			
+		}
+		if (HealthWidgetClass)
+		{
+			APlayerController* PlayerController = Cast<APlayerController>(Controller);
+			check(PlayerController);
+			HealthWidget = CreateWidget<UHealthWidget>(PlayerController, HealthWidgetClass);
+			check(HealthWidget);
+			HealthWidget->AddToPlayerScreen();
+			//Set starting health
+			HealthWidget->UpdateHealth(HitComponent->GetHealth());
+		}
+
 	}
+
+	//Register health events.
+	
+	if (HitComponent)
+	{
+		HitComponent->OnDeathEvent.BindDynamic(this, &AMyCharacter::OnDeath);
+		HitComponent->OnHealthChangedEvent.BindDynamic(this, &AMyCharacter::OnHealthChanged);
+	}
+	
 }
 
 void AMyCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -124,6 +162,12 @@ void AMyCharacter::SetupWeapon()
 	Weapon->SetOwner(this);
 }
 
+void AMyCharacter::UseAbility()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Used abilitiyt"))
+	AbilityInventory->UseAbility();
+}
+
 
 //Testing time widget, move to level based timer.
 void AMyCharacter::TimeTest()
@@ -132,6 +176,22 @@ void AMyCharacter::TimeTest()
 	{
 		TimerTime++;
 		PlayerHUD->SetTime(TimerTime);
+	}
+}
+
+void AMyCharacter::OnDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("DEATH FROM EVENT"))
+}
+
+void AMyCharacter::OnHealthChanged(int Health)
+{
+	
+	if (HealthWidget)
+	{
+		GEngine->AddOnScreenDebugMessage(2, 15.0f, FColor::Yellow, TEXT("hit event happend"));
+		UE_LOG(LogTemp, Warning, TEXT("%i"), Health);
+		HealthWidget->UpdateHealth(Health);
 	}
 }
 
@@ -154,6 +214,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMyCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AMyCharacter::Jump);
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &AMyCharacter::Shoot);
+		EnhancedInputComponent->BindAction(AbilityAction, ETriggerEvent::Started, this, &AMyCharacter::UseAbility);
 	}
 
 }

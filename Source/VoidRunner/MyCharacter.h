@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilityInventory.h"
+#include "HittableComponent.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Weapon.h"
@@ -15,6 +17,8 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class AWeapon;
+
+class UHealthWidget;
 
 UCLASS(config=Game)
 class VOIDRUNNER_API AMyCharacter : public ACharacter
@@ -51,6 +55,9 @@ protected:
 	UInputAction* JumpAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = Input)
+	UInputAction* AbilityAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = Input)
 	UInputAction* ShootAction;
 	
 	UPROPERTY(EditAnywhere, Category = Input)
@@ -60,6 +67,7 @@ protected:
 	float jumpHeight;
 #pragma endregion InputPointers
 
+	//Refactor to widget, not HUD
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UTimerPlayerHUD> PlayerHUDClass;
 
@@ -69,8 +77,23 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<AWeapon> WeaponClass;
 
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UHealthWidget> HealthWidgetClass;
+
+	UPROPERTY()
+	class UHealthWidget* HealthWidget;
+
+	UPROPERTY(VisibleAnywhere)
+	UHittableComponent* HitComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UAbilityInventory* AbilityInventory;
+	
+
 	UPROPERTY()
 	AWeapon* Weapon;
+	
 	
 	//Input callbacks
 	void Move(const FInputActionValue& Value);
@@ -83,9 +106,15 @@ protected:
 
 	void SetupWeapon();
 
+	void UseAbility();
+
 	float TimerTime = 0;
 	void TimeTest();
-	
+
+	UFUNCTION()
+	void OnDeath();
+	UFUNCTION()
+	void OnHealthChanged(int Health);
 	
 
 public:
