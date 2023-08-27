@@ -14,10 +14,6 @@ UAbilityInventory::UAbilityInventory()
 }
 
 
-void UAbilityInventory::ShiftAbility()
-{
-	
-}
 
 // Called when the game starts
 void UAbilityInventory::BeginPlay()
@@ -37,27 +33,28 @@ void UAbilityInventory::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	// ...
 }
 
-void UAbilityInventory::AddAbility(UAbility* Ability)
+//Adds ability if slot if avaliable and returns true, else returns false.
+bool UAbilityInventory::AddAbility(UAbility* Ability)
 {
-	if (Ability)
+	if (!Ability) { return false; }
+	if (!ActiveAbility)
 	{
-		AbilityQueue.Enqueue(Ability);
+		ActiveAbility = Ability;
+		return true;
 	}
+	return false;
 }
 
 void UAbilityInventory::UseAbility()
 {
-	
-
 	//Test superjump
-	ActiveAbility = NewObject<UAbility>(this, SuperJumpAbility);
-	
-	
+	//ActiveAbility = NewObject<UAbility>(this, SuperJumpAbility);
 	if (ActiveAbility)
 	{
 		ActiveAbility->ActivateAbility();
+		ActiveAbility = nullptr;
+		return;
 	}
-
-	
+	UE_LOG(LogTemp, Warning, TEXT("No ability in inventory"));
 }
 
