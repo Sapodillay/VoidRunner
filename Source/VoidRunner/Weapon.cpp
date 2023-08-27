@@ -53,7 +53,7 @@ void AWeapon::FireWeapon()
 		{
 			// Draw the line.
 			DrawDebugLine(GetWorld(), start, end, FColor::Green, true, 3, 0,10.0f);
-			Hittable->Damage(-5);
+			Hittable->Damage(5);
 			return;
 		}
 	}
