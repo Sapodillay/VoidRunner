@@ -17,6 +17,12 @@ AGroundEnemyCharacter::AGroundEnemyCharacter()
 void AGroundEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//Register to hit component.
+	if (UHittableComponent* HittableComponent = FindComponentByClass<UHittableComponent>())
+	{
+		HittableComponent->OnDeathEvent.AddDynamic(this, &AGroundEnemyCharacter::OnDeath);
+	}
 	
 }
 
@@ -24,6 +30,11 @@ void AGroundEnemyCharacter::BeginPlay()
 void AGroundEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AGroundEnemyCharacter::OnDeath()
+{
+	Destroy();
 }
 
 void AGroundEnemyCharacter::Attack()
