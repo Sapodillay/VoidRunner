@@ -13,6 +13,11 @@ UHittableComponent::UHittableComponent()
 	// ...
 }
 
+int UHittableComponent::GetHealth() const
+{
+	return currentHealth;
+}
+
 
 // Called when the game starts
 void UHittableComponent::BeginPlay()
@@ -39,10 +44,23 @@ void UHittableComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 void UHittableComponent::Damage(int damage)
 {
 	currentHealth = FGenericPlatformMath::Max(currentHealth - damage, 0);
-	if (currentHealth == 0)
+
+	OnHealthChangedEvent.ExecuteIfBound(currentHealth);
+	if (OnHealthChangedEvent.IsBound())
+	{
+		OnHealthChangedEvent.Execute(currentHealth);
+	}
+	
+	if (currentHealth <= 0)
 	{
 		//death
 		UE_LOG(LogTemp, Warning, TEXT("Death"))
+		OnDeathEvent.ExecuteIfBound();
 	}
+}
+
+void UHittableComponent::Setup(int Health)
+{
+	maxHealth = currentHealth = Health;
 }
 
