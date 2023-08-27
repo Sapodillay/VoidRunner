@@ -36,7 +36,6 @@ void UBTService_PlayerLocationRadius::TickNode(UBehaviorTreeComponent& OwnerComp
 	}
 
 	const float Distance = FVector::Dist(PlayerPawn->GetActorLocation(), EyeEnemyPawn->GetActorLocation());
-	UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), Distance );
 
 	if (EyeEnemyPawn->attackRadius > Distance)
 	{
