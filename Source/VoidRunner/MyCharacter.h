@@ -93,24 +93,38 @@ protected:
 
 	UPROPERTY()
 	AWeapon* Weapon;
+
+
+	//Setup functions
+	void SetupEvents();
+
+	void SetupUI();
+
+	void SetupInputs();
+
 	
 	
+#pragma region InputCallbacks
 	//Input callbacks
+	UFUNCTION()
 	void Move(const FInputActionValue& Value);
-
+	UFUNCTION()
 	void Look(const FInputActionValue& Value);
-
-	void Jump();
-	
+	UFUNCTION()
+	void OnJump();
+	UFUNCTION()
 	void Shoot();
-
+	UFUNCTION()
 	void SetupWeapon();
-
+	UFUNCTION()
 	void UseAbility();
+#pragma endregion InputCallbacks
 
+	//Refactor later
 	float TimerTime = 0;
 	void TimeTest();
 
+	//events
 	UFUNCTION()
 	void OnDeath();
 	UFUNCTION()

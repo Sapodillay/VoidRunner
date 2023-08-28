@@ -43,59 +43,23 @@ AMyCharacter::AMyCharacter(const FObjectInitializer& ObjectInitalizer)
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
-
-	if (HitComponent)
-	{
-		//remove magic numbers later.
-		HitComponent->Setup(100);
-	}
+	Super::BeginPlay();
 	
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AMyCharacter::TimeTest, 1.0f, true, 0);
 
-	Super::BeginPlay();
 	//Setup inputs
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			 Subsystem->AddMappingContext(MovementContext, 0);
-		}
-	}
+	SetupInputs();
+
 	//Setup weapon
 	SetupWeapon();
 
 	//Setup UI
-	if (IsLocallyControlled())
-	{
-		if (PlayerHUDClass)
-		{
-			APlayerController* PlayerController = Cast<APlayerController>(Controller);
-			check(PlayerController);
-			PlayerHUD = CreateWidget<UTimerPlayerHUD>(PlayerController, PlayerHUDClass);
-			check(PlayerHUD);
-			PlayerHUD->AddToPlayerScreen();			
-		}
-		if (HealthWidgetClass)
-		{
-			APlayerController* PlayerController = Cast<APlayerController>(Controller);
-			check(PlayerController);
-			HealthWidget = CreateWidget<UHealthWidget>(PlayerController, HealthWidgetClass);
-			check(HealthWidget);
-			HealthWidget->AddToPlayerScreen();
-			//Set starting health
-			HealthWidget->UpdateHealth(HitComponent->GetHealth());
-		}
-
-	}
+	SetupUI();
 
 	//Register health events.
 	
-	if (HitComponent)
-	{
-		HitComponent->OnDeathEvent.AddDynamic(this, &AMyCharacter::OnDeath);
-		HitComponent->OnHealthChangedEvent.AddDynamic(this, &AMyCharacter::OnHealthChanged);
-	}
+	SetupEvents();
 	
 }
 
@@ -109,6 +73,52 @@ void AMyCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		PlayerHUD = nullptr;
 	}
 	
+}
+
+void AMyCharacter::SetupEvents()
+{
+	if (HitComponent)
+	{
+		HitComponent->OnDeathEvent.AddDynamic(this, &AMyCharacter::OnDeath);
+		HitComponent->OnHealthChangedEvent.AddDynamic(this, &AMyCharacter::OnHealthChanged);
+	}
+}
+
+void AMyCharacter::SetupUI()
+{
+	//Check player has controller
+	if (IsLocallyControlled())
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(Controller);
+		if (PlayerHUDClass)
+		{
+			check(PlayerController);
+			PlayerHUD = CreateWidget<UTimerPlayerHUD>(PlayerController, PlayerHUDClass);
+			check(PlayerHUD);
+			PlayerHUD->AddToPlayerScreen();			
+		}
+		if (HealthWidgetClass)
+		{
+			check(PlayerController);
+			HealthWidget = CreateWidget<UHealthWidget>(PlayerController, HealthWidgetClass);
+			check(HealthWidget);
+			HealthWidget->AddToPlayerScreen();
+			//Set starting health
+			HealthWidget->UpdateHealth(HitComponent->GetHealth());
+		}
+
+	}
+}
+
+void AMyCharacter::SetupInputs()
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(MovementContext, 0);
+		}
+	}
 }
 
 void AMyCharacter::Move(const FInputActionValue& Value)
@@ -142,7 +152,7 @@ void AMyCharacter::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookVector.Y);
 }
 
-void AMyCharacter::Jump()
+void AMyCharacter::OnJump()
 {
 	Super::Jump();	
 }
@@ -164,7 +174,6 @@ void AMyCharacter::SetupWeapon()
 
 void AMyCharacter::UseAbility()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Used abilitiyt"))
 	AbilityInventory->UseAbility();
 }
 
@@ -190,7 +199,6 @@ void AMyCharacter::OnHealthChanged(int Health)
 	if (HealthWidget)
 	{
 		GEngine->AddOnScreenDebugMessage(2, 15.0f, FColor::Yellow, TEXT("hit event happend"));
-		UE_LOG(LogTemp, Warning, TEXT("%i"), Health);
 		HealthWidget->UpdateHealth(Health);
 	}
 }
