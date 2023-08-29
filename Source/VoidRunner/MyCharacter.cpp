@@ -12,6 +12,7 @@
 #include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "VoidGameInstance.h"
 
 
 // Sets default values
@@ -37,6 +38,9 @@ AMyCharacter::AMyCharacter(const FObjectInitializer& ObjectInitalizer)
 
 	HealthWidget = nullptr;
 	HealthWidgetClass = nullptr;
+
+	GameOverWidget = nullptr;
+	GameOverWidgetClass = nullptr;
 	
 }
 
@@ -191,6 +195,12 @@ void AMyCharacter::TimeTest()
 void AMyCharacter::OnDeath()
 {
 	UE_LOG(LogTemp, Warning, TEXT("DEATH FROM EVENT"))
+	UVoidGameInstance* GameInstance = Cast<UVoidGameInstance>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->TransitionState(GameOver);
+	}
+	
 }
 
 void AMyCharacter::OnHealthChanged(int Health)

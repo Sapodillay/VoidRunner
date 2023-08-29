@@ -67,6 +67,9 @@ protected:
 	float jumpHeight;
 #pragma endregion InputPointers
 
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	TSubclassOf<AWeapon> WeaponClass;
+	
 	//Refactor to widget, not HUD
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UTimerPlayerHUD> PlayerHUDClass;
@@ -74,9 +77,11 @@ protected:
 	UPROPERTY()
 	class UTimerPlayerHUD* PlayerHUD;
 	
-	UPROPERTY(EditDefaultsOnly, Category = Weapon)
-	TSubclassOf<AWeapon> WeaponClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UGameOverUI> GameOverWidgetClass;
 
+	UPROPERTY()
+	class UGameOverUI* GameOverWidget;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UHealthWidget> HealthWidgetClass;
@@ -84,6 +89,7 @@ protected:
 	UPROPERTY()
 	class UHealthWidget* HealthWidget;
 
+	//System Components
 	UPROPERTY(VisibleAnywhere)
 	UHittableComponent* HitComponent;
 
