@@ -4,6 +4,7 @@
 #include "VoidGameInstance.h"
 
 #include "MainMenuWidget.h"
+#include "UI/GameOverUI.h"
 #include "Kismet/GameplayStatics.h"
 
 //Move to an event.
@@ -20,6 +21,21 @@ void UVoidGameInstance::ShowMainMenu()
 	MainMenuHUD->AddToPlayerScreen();
 	MainMenuHUD->Setup();
 	PlayerController->SetInputMode(FInputModeUIOnly());
+}
+
+void UVoidGameInstance::ShowGameOver()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("Showing Game over"))
+	APlayerController* PlayerController = GetPrimaryPlayerController();
+	check(PlayerController);
+	GameOverUI = CreateWidget<UGameOverUI>(PlayerController, GameOverUIClass);
+	check(GameOverUI);
+
+	GameOverUI->AddToPlayerScreen();
+	GameOverUI->Setup();
+	PlayerController->SetInputMode(FInputModeUIOnly());
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }
 
 void UVoidGameInstance::TransitionState(EVoidGameState NewState)
@@ -55,6 +71,13 @@ void UVoidGameInstance::TransitionState(EVoidGameState NewState)
 		{
 			
 		}
+		case GameOver:
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Transitioning from GameOver"))
+				GameOverUI->SetVisibility(ESlateVisibility::Hidden);
+				GetPrimaryPlayerController()->SetInputMode(FInputModeGameOnly());
+				UGameplayStatics::SetGamePaused(GetWorld(), false);
+			}
 		default: ;
 	}
 	
@@ -76,6 +99,11 @@ void UVoidGameInstance::TransitionState(EVoidGameState NewState)
 				}
 				UGameplayStatics::OpenLevel(GetWorld(), FName(LevelDataAsset->GetWorldName()), true);
 			
+			}
+		case GameOver:
+			{
+				ShowGameOver();
+				break;
 			}
 		default: ;
 	}

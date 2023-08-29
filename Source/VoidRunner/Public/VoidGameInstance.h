@@ -22,6 +22,12 @@ class VOIDRUNNER_API UVoidGameInstance : public UGameInstance
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UMainMenuWidget> MainMenuHUDClass;
 
+	UPROPERTY()
+	class UGameOverUI* GameOverUI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UGameOverUI> GameOverUIClass;
+
 	UPROPERTY(EditAnywhere)
 	ULevelDataAsset* LevelDataAsset;
 
@@ -30,6 +36,8 @@ public:
 	TEnumAsByte<EVoidGameState> GameState;
 
 	void ShowMainMenu();
+
+	void ShowGameOver();
 
 	void TransitionState(EVoidGameState NewState);
 

@@ -8,4 +8,5 @@ enum EVoidGameState
 	Startup,
 	MainMenu,
 	Game,
+	GameOver,
 };
