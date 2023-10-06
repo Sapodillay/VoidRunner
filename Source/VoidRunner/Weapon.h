@@ -19,6 +19,9 @@ public:
 	AWeapon();
 	void FireWeapon();
 
+	UFUNCTION()
+	void Reload();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -27,11 +30,28 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shooting")
+	bool hasShoot;
+	
 private:
-	UPROPERTY(VisibleAnywhere)
-	USceneComponent* Root;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AActor> ProjectileClass;
+
+
+	UPROPERTY(EditDefaultsOnly)
+	FRotator RotatorOffset;
+
+	UPROPERTY(EditDefaultsOnly)
+	FVector LocationOffset;
+	
+	UPROPERTY(EditDefaultsOnly)
+	USkeletalMesh* MeshInstance;
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* Mesh;
+	USkeletalMeshComponent* SkeletalMeshComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UParticleSystem* ImpactParticles;
 	
 };
