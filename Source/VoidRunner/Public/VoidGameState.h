@@ -9,4 +9,5 @@ enum EVoidGameState
 	MainMenu,
 	Game,
 	GameOver,
+	Winning,
 };
